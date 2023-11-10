@@ -2,10 +2,11 @@ import 'dart:core';
 
 import 'package:flutter/cupertino.dart';
 import 'package:myfinances/controllers/new_expense_controller.dart';
+import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
 
 //Providers
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
-import 'package:myfinances/widgets/dropdown_tags.dart';
+import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 
 class NewExpensePage extends StatefulWidget {
   const NewExpensePage({Key? key}) : super(key: key);
@@ -15,7 +16,6 @@ class NewExpensePage extends StatefulWidget {
 }
 
 class _NewExpensePageState extends State<NewExpensePage> {
-
   NewExpenseController newExpenseController = NewExpenseController();
 
   @override
@@ -23,10 +23,6 @@ class _NewExpensePageState extends State<NewExpensePage> {
     newExpenseController.retrieveTagList();
     super.initState();
   }
-
-
-
-  void _saveExpense() {}
 
   @override
   Widget build(BuildContext context) {
@@ -47,7 +43,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 children: <Widget>[
                   CupertinoFormRow(
                     child: CupertinoTextFormFieldRow(
-                      controller: newExpenseController.nameExpenseInputController,
+                      controller:
+                          newExpenseController.nameExpenseInputController,
                       prefix: const Text('Nome'),
                       placeholder: 'nome do gasto',
                       validator: (String? value) {
@@ -60,7 +57,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   ),
                   CupertinoFormRow(
                     child: CupertinoTextFormFieldRow(
-                      controller: newExpenseController.valueExpenseInputController,
+                      controller:
+                          newExpenseController.valueExpenseInputController,
                       prefix: const Text('Valor'),
                       placeholder: 'valor do gasto',
                       validator: (String? value) {
@@ -74,7 +72,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 ],
               ),
               CupertinoFormSection.insetGrouped(
-                header: const Text('TAG'),
+                header: const Text('CATEGORIA'),
                 children: <Widget>[
                   CupertinoFormRow(
                     child: Row(
@@ -83,10 +81,19 @@ class _NewExpensePageState extends State<NewExpensePage> {
                             child: const Row(
                               children: [
                                 Icon(CupertinoIcons.add_circled_solid),
-                                SizedBox(width: 2,),
-                                Text('Nova tag'),
+                                SizedBox(
+                                  width: 2,
+                                ),
+                                Text('Nova categoria'),
                               ],
-                            ), onPressed: () {}),
+                            ),
+                            onPressed: () {
+                              showCupertinoDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return const NewTagDialog();
+                                  });
+                            }),
                         const Spacer(),
                         CupertinoButton(
                             padding: EdgeInsets.zero,
@@ -96,7 +103,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                     squeeze: 1.2,
                                     useMagnifier: true,
                                     itemExtent: 32.0,
-                                    scrollController: FixedExtentScrollController(
+                                    scrollController:
+                                        FixedExtentScrollController(
                                       initialItem: newExpenseController.selectedTag,
                                     ),
                                     onSelectedItemChanged: (int selectedItem) {
@@ -106,13 +114,16 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                     },
                                     children: List<Widget>.generate(
                                         newExpenseController.dropdownList.length, (int index) {
-                                        return Center(child: newExpenseController.dropdownList[index]);
+                                      return Center(
+                                          child: newExpenseController.dropdownList[index]);
                                     }),
                                   ),
                                   context,
                                 ),
                             // This displays the selected fruit name.
-                            child: newExpenseController.dropdownList[newExpenseController.selectedTag]),
+                            child: newExpenseController.dropdownList[
+                                newExpenseController.selectedTag]
+                        ),
                       ],
                     ),
                   ),
@@ -121,7 +132,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
               const SizedBox(height: 30),
               CupertinoButton.filled(
                 onPressed: () {
-                  _saveExpense();
+                  newExpenseController.saveExpense();
                 },
                 child: const Text('OK'),
               ),

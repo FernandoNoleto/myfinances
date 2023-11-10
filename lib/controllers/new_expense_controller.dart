@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
+import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
 
-import '../widgets/dropdown_tags.dart';
+import '../widgets/dropdown_tags_widget.dart';
 
 class NewExpenseController{
-
   final TextEditingController nameExpenseInputController = TextEditingController();
   final TextEditingController valueExpenseInputController = TextEditingController();
 
@@ -18,6 +18,8 @@ class NewExpenseController{
     dropdownList.add(const DropdownTags(color: CupertinoColors.link, tag: 'Compras na internet'));
   }
 
+  void addNewTag(){
 
-
+  }
+  void saveExpense() {}
 }
