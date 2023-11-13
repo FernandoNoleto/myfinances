@@ -1,12 +1,14 @@
 import 'dart:core';
-
 import 'package:flutter/cupertino.dart';
+
+//Controllers
 import 'package:myfinances/controllers/new_expense_controller.dart';
+
+//Widgets
 import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
 
-//Providers
+//Entities
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
-import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 
 class NewExpensePage extends StatefulWidget {
   const NewExpensePage({Key? key}) : super(key: key);
@@ -43,10 +45,10 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 children: <Widget>[
                   CupertinoFormRow(
                     child: CupertinoTextFormFieldRow(
-                      controller:
-                          newExpenseController.nameExpenseInputController,
+                      controller: newExpenseController.nameExpenseInputController,
                       prefix: const Text('Nome'),
                       placeholder: 'nome do gasto',
+                      maxLength: 18,
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
                           return 'Digite o nome do gasto';
@@ -76,54 +78,51 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 children: <Widget>[
                   CupertinoFormRow(
                     child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CupertinoButton(
                             child: const Row(
                               children: [
                                 Icon(CupertinoIcons.add_circled_solid),
-                                SizedBox(
-                                  width: 2,
-                                ),
-                                Text('Nova categoria'),
+                                SizedBox(width: 2,),
+                                Text('Categoria'),
                               ],
                             ),
                             onPressed: () {
                               showCupertinoDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return const NewTagDialog();
-                                  });
-                            }),
-                        const Spacer(),
-                        CupertinoButton(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return const NewTagDialog();
+                                });
+                        }),
+                        newExpenseController.dropdownList.isNotEmpty ? CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: () => ModalDialogProvider().showDialog(
-                                  CupertinoPicker(
-                                    magnification: 1.22,
-                                    squeeze: 1.2,
-                                    useMagnifier: true,
-                                    itemExtent: 32.0,
-                                    scrollController:
-                                        FixedExtentScrollController(
-                                      initialItem: newExpenseController.selectedTag,
-                                    ),
-                                    onSelectedItemChanged: (int selectedItem) {
-                                      setState(() {
-                                        newExpenseController.selectedTag = selectedItem;
-                                      });
-                                    },
-                                    children: List<Widget>.generate(
-                                        newExpenseController.dropdownList.length, (int index) {
-                                      return Center(
-                                          child: newExpenseController.dropdownList[index]);
-                                    }),
-                                  ),
-                                  context,
+                              CupertinoPicker(
+                                magnification: 1.22,
+                                squeeze: 1.2,
+                                useMagnifier: true,
+                                itemExtent: 32.0,
+                                scrollController:
+                                FixedExtentScrollController(initialItem: newExpenseController.selectedTag,
                                 ),
+                                onSelectedItemChanged: (int selectedItem) {
+                                  setState(() {
+                                    newExpenseController.selectedTag = selectedItem;
+                                  });
+                                },
+                                children: List<Widget>.generate(
+                                    newExpenseController.dropdownList.length, (int index) {
+                                  return Center(
+                                      child: newExpenseController.dropdownList[index]);
+                                }),
+                              ),
+                              context,
+                            ),
                             // This displays the selected fruit name.
-                            child: newExpenseController.dropdownList[
-                                newExpenseController.selectedTag]
-                        ),
+                            child: newExpenseController.dropdownList[newExpenseController.selectedTag]
+                        ) :
+                        const SizedBox(),
                       ],
                     ),
                   ),
