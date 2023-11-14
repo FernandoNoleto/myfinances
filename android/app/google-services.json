@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "956330963816",
+    "firebase_url": "https://myfinances-5d32a-default-rtdb.firebaseio.com",
+    "project_id": "myfinances-5d32a",
+    "storage_bucket": "myfinances-5d32a.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:956330963816:android:ef9caa1c9d1c1863845cdd",
+        "android_client_info": {
+          "package_name": "com.example.myfinances"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNQLCeJ5elNsGo-mt4ZQjHKokDwgq9r6E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

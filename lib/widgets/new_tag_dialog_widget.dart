@@ -8,6 +8,7 @@ class NewTagDialog extends StatefulWidget {
   const NewTagDialog({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _NewTagDialogState createState() => _NewTagDialogState();
 }
 
@@ -21,23 +22,17 @@ class _NewTagDialogState extends State<NewTagDialog> {
       content: Column(
         children: [
           Form(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              children: [
-                CupertinoFormRow(
-                  child: CupertinoTextFormFieldRow(
-                    // prefix: const Text('Nome'),
-                    placeholder: 'Nome da nova categoria',
-                    controller: nameTagInputController,
-                    validator: (String? value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Digite o nome da nova categoria';
-                      }
-                      return null;
-                    },
-                  ),
-                ),
-              ],
+            child: CupertinoFormRow(
+              child: CupertinoTextFormFieldRow(
+                placeholder: 'Nome da nova categoria',
+                controller: nameTagInputController,
+                validator: (String? value) {
+                  if (value == null || value.isEmpty) {
+                    return 'Digite o nome da nova categoria';
+                  }
+                  return null;
+                },
+              ),
             ),
           ),
           BlockPicker(
@@ -58,9 +53,11 @@ class _NewTagDialogState extends State<NewTagDialog> {
         CupertinoButton(
             child: const Text('Confirmar'),
             onPressed: () {
-              if(nameTagInputController.text != null && nameTagInputController.text != ""){
+              if(nameTagInputController.text != ""){
                 Navigator.pop(context);
                 NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
+                // NewExpenseController().dropdownList.clear();
+                NewExpenseController().retrieveTagList();
               }
               else{
 

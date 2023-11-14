@@ -1,28 +1,38 @@
 import 'dart:core';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 //Controllers
 import 'package:myfinances/controllers/new_expense_controller.dart';
 
 //Widgets
-import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
+//import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
 
 //Entities
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
+
+import '../entities/tag.dart';
 
 class NewExpensePage extends StatefulWidget {
   const NewExpensePage({Key? key}) : super(key: key);
 
   @override
+  // ignore: library_private_types_in_public_api
   _NewExpensePageState createState() => _NewExpensePageState();
 }
 
 class _NewExpensePageState extends State<NewExpensePage> {
   NewExpenseController newExpenseController = NewExpenseController();
+  late List<Widget> listaDeTags = [];
+  late int selectedTag = 0;
+  late Color colorSelected = Colors.red;
+  late TextEditingController nameTagInputController = TextEditingController();
 
   @override
   void initState() {
-    newExpenseController.retrieveTagList();
+    listaDeTags.clear();
+    listaDeTags = newExpenseController.retrieveTagList();
     super.initState();
   }
 
@@ -60,7 +70,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   CupertinoFormRow(
                     child: CupertinoTextFormFieldRow(
                       controller:
-                          newExpenseController.valueExpenseInputController,
+                      newExpenseController.valueExpenseInputController,
                       prefix: const Text('Valor'),
                       placeholder: 'valor do gasto',
                       validator: (String? value) {
@@ -78,7 +88,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                 children: <Widget>[
                   CupertinoFormRow(
                     child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         CupertinoButton(
                             child: const Row(
@@ -90,12 +100,63 @@ class _NewExpensePageState extends State<NewExpensePage> {
                             ),
                             onPressed: () {
                               showCupertinoDialog(
-                                context: context,
-                                builder: (BuildContext context) {
-                                  return const NewTagDialog();
-                                });
-                        }),
-                        newExpenseController.dropdownList.isNotEmpty ? CupertinoButton(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return CupertinoAlertDialog(
+                                      content: Column(
+                                        children: [
+                                          Form(
+                                            child: CupertinoFormRow(
+                                              child: CupertinoTextFormFieldRow(
+                                                placeholder: 'Nome da nova categoria',
+                                                controller: nameTagInputController,
+                                                validator: (String? value) {
+                                                  if (value == null || value.isEmpty) {
+                                                    return 'Digite o nome da nova categoria';
+                                                  }
+                                                  return null;
+                                                },
+                                              ),
+                                            ),
+                                          ),
+                                          BlockPicker(
+                                            pickerColor: Colors.red,
+                                            onColorChanged: (Color color) {
+                                              setState(() {
+                                                colorSelected = color;
+                                              });
+                                            },
+                                          ),
+                                          Icon(
+                                            CupertinoIcons.tag_fill,
+                                            color: colorSelected,
+                                          ),
+                                        ],
+                                      ),
+                                      actions: [
+                                        CupertinoButton(
+                                            child: const Text('Confirmar'),
+                                            onPressed: () {
+                                              if(nameTagInputController.text != ""){
+                                                Navigator.pop(context);
+                                                NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
+                                                listaDeTags.clear();
+                                                listaDeTags = NewExpenseController().retrieveTagList();
+                                              }
+                                              else{
+
+                                              }
+                                            }),
+                                        CupertinoButton(
+                                            child: const Text('Cancelar'),
+                                            onPressed: () {
+                                              Navigator.pop(context);
+                                            }),
+                                      ],
+                                    );
+                                  });
+                            }),
+                        listaDeTags.isNotEmpty ? CupertinoButton(
                             padding: EdgeInsets.zero,
                             onPressed: () => ModalDialogProvider().showDialog(
                               CupertinoPicker(
@@ -104,23 +165,21 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                 useMagnifier: true,
                                 itemExtent: 32.0,
                                 scrollController:
-                                FixedExtentScrollController(initialItem: newExpenseController.selectedTag,
-                                ),
+                                FixedExtentScrollController(initialItem: selectedTag,),
                                 onSelectedItemChanged: (int selectedItem) {
                                   setState(() {
-                                    newExpenseController.selectedTag = selectedItem;
+                                    selectedTag = selectedItem;
                                   });
                                 },
-                                children: List<Widget>.generate(
-                                    newExpenseController.dropdownList.length, (int index) {
+                                children: List<Widget>.generate(listaDeTags.length, (int index) {
                                   return Center(
-                                      child: newExpenseController.dropdownList[index]);
+                                      child: listaDeTags[index]
+                                  );
                                 }),
                               ),
                               context,
                             ),
-                            // This displays the selected fruit name.
-                            child: newExpenseController.dropdownList[newExpenseController.selectedTag]
+                            child: listaDeTags[selectedTag]
                         ) :
                         const SizedBox(),
                       ],
