@@ -10,7 +10,7 @@ import 'package:myfinances/controllers/new_expense_controller.dart';
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
 
 //Entities
-import '../entities/tag.dart';
+import 'package:myfinances/entities/tag.dart';
 
 
 class NewExpensePage extends StatefulWidget {
@@ -33,7 +33,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
   void initState() {
     selectedTag = 0;
     colorSelected = Colors.red;
-    listOfTags = newExpenseController.getTagsWidgetsList();
+    listOfTags = newExpenseController.retrieveTagList();
     super.initState();
   }
 
@@ -131,6 +131,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                             },
                                           ),
                                           Icon(
+                                            //TODO: Icon não está atualizando a cor conforme seleciona uma cor diferente no BlockPicker
                                             CupertinoIcons.tag_fill,
                                             color: colorSelected,
                                           ),
@@ -142,9 +143,10 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                             onPressed: () {
                                               if(nameTagInputController.text != ""){
                                                 Navigator.pop(context);
+                                                //TODO: Refatorar addNewTag para não precisar instanciar uma classe Tag
                                                 NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
                                                 setState(() {
-                                                  listOfTags = newExpenseController.getTagsWidgetsList();
+                                                  listOfTags = newExpenseController.retrieveTagList();
                                                 });
                                               }
                                               else{

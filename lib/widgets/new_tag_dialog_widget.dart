@@ -51,23 +51,24 @@ class _NewTagDialogState extends State<NewTagDialog> {
       ),
       actions: [
         CupertinoButton(
-            child: const Text('Confirmar'),
-            onPressed: () {
-              if(nameTagInputController.text != ""){
-                Navigator.pop(context);
-                NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
-                // NewExpenseController().dropdownList.clear();
-                NewExpenseController().retrieveTagList();
-              }
-              else{
-
-              }
-            }),
-        CupertinoButton(
-            child: const Text('Cancelar'),
-            onPressed: () {
+          child: const Text('Confirmar'),
+          onPressed: () {
+            if(nameTagInputController.text != ""){
               Navigator.pop(context);
-            }),
+              NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
+              NewExpenseController().retrieveTagList();
+            }
+            else{
+
+            }
+          }
+        ),
+        CupertinoButton(
+          child: const Text('Cancelar'),
+          onPressed: () {
+            Navigator.pop(context);
+          }
+        ),
       ],
     );
   }
