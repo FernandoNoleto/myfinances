@@ -7,12 +7,11 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:myfinances/controllers/new_expense_controller.dart';
 
 //Widgets
-//import 'package:myfinances/widgets/new_tag_dialog_widget.dart';
-
-//Entities
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
 
+//Entities
 import '../entities/tag.dart';
+
 
 class NewExpensePage extends StatefulWidget {
   const NewExpensePage({Key? key}) : super(key: key);
@@ -24,15 +23,17 @@ class NewExpensePage extends StatefulWidget {
 
 class _NewExpensePageState extends State<NewExpensePage> {
   NewExpenseController newExpenseController = NewExpenseController();
-  late List<Widget> listaDeTags = [];
-  late int selectedTag = 0;
-  late Color colorSelected = Colors.red;
-  late TextEditingController nameTagInputController = TextEditingController();
+  late Future<List<Widget>>? listOfTags;
+  late int selectedTag;
+  late Color colorSelected;
+  final TextEditingController nameTagInputController = TextEditingController();
+
 
   @override
   void initState() {
-    listaDeTags.clear();
-    listaDeTags = newExpenseController.retrieveTagList();
+    selectedTag = 0;
+    colorSelected = Colors.red;
+    listOfTags = newExpenseController.getTagsWidgetsList();
     super.initState();
   }
 
@@ -50,6 +51,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
           },
           child: Column(
             children: [
+              //DESPESA FORM
               CupertinoFormSection.insetGrouped(
                 header: const Text('DESPESA'),
                 children: <Widget>[
@@ -69,8 +71,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   ),
                   CupertinoFormRow(
                     child: CupertinoTextFormFieldRow(
-                      controller:
-                      newExpenseController.valueExpenseInputController,
+                      controller: newExpenseController.valueExpenseInputController,
                       prefix: const Text('Valor'),
                       placeholder: 'valor do gasto',
                       validator: (String? value) {
@@ -83,6 +84,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                   ),
                 ],
               ),
+              //CATEGORIA FORM
               CupertinoFormSection.insetGrouped(
                 header: const Text('CATEGORIA'),
                 children: <Widget>[
@@ -90,6 +92,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
+                        //ADD TAG
                         CupertinoButton(
                             child: const Row(
                               children: [
@@ -140,48 +143,63 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                               if(nameTagInputController.text != ""){
                                                 Navigator.pop(context);
                                                 NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
-                                                listaDeTags.clear();
-                                                listaDeTags = NewExpenseController().retrieveTagList();
+                                                setState(() {
+                                                  listOfTags = newExpenseController.getTagsWidgetsList();
+                                                });
                                               }
                                               else{
 
                                               }
-                                            }),
+                                            }
+                                        ),
                                         CupertinoButton(
                                             child: const Text('Cancelar'),
                                             onPressed: () {
                                               Navigator.pop(context);
-                                            }),
+                                            }
+                                        ),
                                       ],
                                     );
-                                  });
-                            }),
-                        listaDeTags.isNotEmpty ? CupertinoButton(
-                            padding: EdgeInsets.zero,
-                            onPressed: () => ModalDialogProvider().showDialog(
-                              CupertinoPicker(
-                                magnification: 1.22,
-                                squeeze: 1.2,
-                                useMagnifier: true,
-                                itemExtent: 32.0,
-                                scrollController:
-                                FixedExtentScrollController(initialItem: selectedTag,),
-                                onSelectedItemChanged: (int selectedItem) {
-                                  setState(() {
-                                    selectedTag = selectedItem;
-                                  });
-                                },
-                                children: List<Widget>.generate(listaDeTags.length, (int index) {
-                                  return Center(
-                                      child: listaDeTags[index]
-                                  );
-                                }),
-                              ),
-                              context,
-                            ),
-                            child: listaDeTags[selectedTag]
-                        ) :
-                        const SizedBox(),
+                                  }
+                              );
+                            }
+                        ),
+                        //DROPDOWN TAGS
+                        FutureBuilder<List<Widget>>(
+                          future: listOfTags,
+                          builder: (context, snapshot){
+                            if (snapshot.connectionState == ConnectionState.waiting) {
+                              return const CupertinoActivityIndicator();
+                            } else {
+                              debugPrint("snapshot: ${snapshot.data}");
+                              return CupertinoButton(
+                                  padding: EdgeInsets.zero,
+                                  onPressed: () => ModalDialogProvider().showDialog(
+                                    CupertinoPicker(
+                                      magnification: 1.22,
+                                      squeeze: 1.2,
+                                      useMagnifier: true,
+                                      itemExtent: 32.0,
+                                      scrollController:
+                                      FixedExtentScrollController(initialItem: snapshot.data!.length,),
+                                      onSelectedItemChanged: (int selectedItem) {
+                                        setState(() {
+                                          selectedTag = selectedItem;
+                                        });
+                                      },
+                                      children: List<Widget>.generate(snapshot.data!.length, (int index) {
+                                        return Center(
+                                            child: snapshot.data![index]
+                                        );
+                                      }),
+                                    ),
+                                    context,
+                                  ),
+                                  child: snapshot.data![selectedTag]
+                              );
+                            }
+                          },
+                        ),
                       ],
                     ),
                   ),

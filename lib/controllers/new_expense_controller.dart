@@ -44,13 +44,34 @@ class NewExpenseController{
     return dropdownList;
   }
 
-  // void addItem(Color tagColor, String tagName){
-  //   dropdownList.add(DropdownTags(color: tagColor, tag: tagName));
-  // }
 
-  int getHexFromColor(Color color){
-    return color.value;
+  Future<List<Widget>> getTagsWidgetsList() async {
+    List<Widget> dropdownlista = [];
+
+    List<Tag> tagsList = [];
+    FirebaseDatabase.instance.ref().child("/Tags").onValue.listen((event) {
+      final objects = event.snapshot.children;
+      for (DataSnapshot object in objects) {
+        Tag tag = Tag.fromJson(jsonDecode(jsonEncode(Map<String, dynamic>.from(object.value as Map<dynamic, dynamic>))));
+        tagsList.add(tag);
+        // print(tag);
+      }
+      for(Tag tag in tagsList){
+        dropdownlista.add(
+            DropdownTags(
+                color: Color(tag.color), tag: tag.name,
+            )
+        );
+      }
+
+      for (var element in dropdownlista){
+        debugPrint("element: $element");
+      }
+    });
+
+    return dropdownlista;
   }
+
 
   void addNewTag(Tag tag) async{
     final tagReference = FirebaseProvider().connection('/Tags/${tag.name}');
