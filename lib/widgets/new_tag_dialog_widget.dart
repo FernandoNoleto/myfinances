@@ -56,7 +56,6 @@ class _NewTagDialogState extends State<NewTagDialog> {
             if(nameTagInputController.text != ""){
               Navigator.pop(context);
               NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
-              NewExpenseController().retrieveTagList();
             }
             else{
 

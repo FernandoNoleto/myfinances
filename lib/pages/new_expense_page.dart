@@ -7,6 +7,7 @@ import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 //Controllers
 import 'package:myfinances/controllers/new_expense_controller.dart';
+import 'package:myfinances/entities/expense.dart';
 import 'package:myfinances/providers/firebase_provider.dart';
 import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 
@@ -27,15 +28,17 @@ class NewExpensePage extends StatefulWidget {
 
 class _NewExpensePageState extends State<NewExpensePage> {
   NewExpenseController newExpenseController = NewExpenseController();
-  late int selectedTag;
-  late Color colorSelected;
+  late int selectedTagIndex;
+  late Color selectedColor;
+  late Tag selectedTag;
+  late List<Tag> tagList = [];
   final TextEditingController nameTagInputController = TextEditingController();
 
 
   @override
   void initState() {
-    selectedTag = 0;
-    colorSelected = Colors.red;
+    selectedTagIndex = 0;
+    selectedColor = Colors.red;
     super.initState();
   }
 
@@ -128,14 +131,14 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                             pickerColor: Colors.red,
                                             onColorChanged: (Color color) {
                                               setState(() {
-                                                colorSelected = color;
+                                                selectedColor = color;
                                               });
                                             },
                                           ),
                                           Icon(
                                             //TODO: Icon não está atualizando a cor conforme seleciona uma cor diferente no BlockPicker
                                             CupertinoIcons.tag_fill,
-                                            color: colorSelected,
+                                            color: selectedColor,
                                           ),
                                         ],
                                       ),
@@ -146,7 +149,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                               if(nameTagInputController.text != ""){
                                                 Navigator.pop(context);
                                                 //TODO: Refatorar addNewTag para não precisar instanciar uma classe Tag
-                                                NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
+                                                NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: selectedColor.value));
                                                 setState(() {
                                                   // listOfTags = newExpenseController.retrieveTagList();
                                                 });
@@ -176,11 +179,14 @@ class _NewExpensePageState extends State<NewExpensePage> {
                               return const CupertinoActivityIndicator();
                             } else {
                               final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
-                              List<Widget> dropdownlist = [];
+                              final List<Widget> dropdownlist = [];
+
                               myTags.forEach((key, value) {
                                 final nextTag = Map<String, dynamic>.from(value);
+                                final tag = Tag(name: nextTag['name'], color: nextTag['color']);
+                                tagList.add(tag);
                                 // debugPrint("${nextTag['name']}: ${nextTag['color']}");
-                                dropdownlist.add(DropdownTags(color: Color(nextTag['color']), tag: nextTag['name']));
+                                dropdownlist.add(DropdownTags(tag: tag));
                               });
                               return CupertinoButton(
                                   padding: EdgeInsets.zero,
@@ -194,7 +200,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                       FixedExtentScrollController(initialItem: dropdownlist.length,),
                                       onSelectedItemChanged: (int selectedItem) {
                                         setState(() {
-                                          selectedTag = selectedItem;
+                                          selectedTagIndex = selectedItem;
+                                          selectedTag = tagList[selectedTagIndex];
                                         });
                                       },
                                       children: List<Widget>.generate(dropdownlist.length, (int index) {
@@ -205,7 +212,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                     ),
                                     context,
                                   ),
-                                  child: dropdownlist[selectedTag]
+                                  child: dropdownlist[selectedTagIndex]
                               );
                             }
                           },
@@ -218,7 +225,12 @@ class _NewExpensePageState extends State<NewExpensePage> {
               const SizedBox(height: 30),
               CupertinoButton.filled(
                 onPressed: () {
-                  newExpenseController.saveExpense();
+                  Expense expense = Expense(
+                    name: newExpenseController.nameExpenseInputController.text,
+                    value: int.parse(newExpenseController.valueExpenseInputController.text),
+                    tag: tagList[selectedTagIndex],
+                  );
+                  newExpenseController.saveExpense(expense);
                 },
                 child: const Text('OK'),
               ),
