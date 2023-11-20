@@ -2,7 +2,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:myfinances/controllers/new_expense_controller.dart';
-import 'package:myfinances/entities/tag.dart';
 
 class NewTagDialog extends StatefulWidget {
   const NewTagDialog({Key? key}) : super(key: key);
@@ -55,7 +54,10 @@ class _NewTagDialogState extends State<NewTagDialog> {
           onPressed: () {
             if(nameTagInputController.text != ""){
               Navigator.pop(context);
-              NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
+              NewExpenseController().addNewTag(
+                  nameTagInputController.text,
+                  colorSelected.value
+              );
             }
             else{
 

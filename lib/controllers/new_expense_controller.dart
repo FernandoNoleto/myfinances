@@ -15,7 +15,8 @@ class NewExpenseController{
   final TextEditingController nameExpenseInputController = TextEditingController();
   final TextEditingController valueExpenseInputController = TextEditingController();
 
-  void addNewTag(Tag tag) async{
+  void addNewTag(String name, int color) async{
+    Tag tag = Tag(name: name, color: color);
     final tagReference = FirebaseProvider().connection('/Tags/${tag.name}');
     try{
       await tagReference.update(tag.toJson());
@@ -24,7 +25,8 @@ class NewExpenseController{
     }
 
   }
-  void saveExpense(Expense expense) async {
+  void saveExpense(String name, int value, Tag tag) async {
+    Expense expense = Expense(name: name, value: value, tag: tag);
     debugPrint(''' Expense:
     name: ${expense.name}
     value: ${expense.value}

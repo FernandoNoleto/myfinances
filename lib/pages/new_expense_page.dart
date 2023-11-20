@@ -16,7 +16,6 @@ import 'package:myfinances/widgets/modal_dialog_widget.dart';
 
 //Entities
 import 'package:myfinances/entities/tag.dart';
-import 'package:myfinances/entities/expense.dart';
 
 
 class NewExpensePage extends StatefulWidget {
@@ -148,26 +147,22 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                       ),
                                       actions: [
                                         CupertinoButton(
-                                            child: const Text('Confirmar'),
-                                            onPressed: () {
-                                              if(nameTagInputController.text != ""){
-                                                Navigator.pop(context);
-                                                //TODO: Refatorar addNewTag para não precisar instanciar uma classe Tag
-                                                NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: selectedColor.value));
-                                                setState(() {
-                                                  // listOfTags = newExpenseController.retrieveTagList();
-                                                });
-                                              }
-                                              else{
-
-                                              }
+                                          child: const Text('Confirmar'),
+                                          onPressed: () {
+                                            if(nameTagInputController.text != ""){
+                                              Navigator.pop(context);
+                                              NewExpenseController().addNewTag(
+                                                nameTagInputController.text,
+                                                selectedColor.value
+                                              );
                                             }
+                                          }
                                         ),
                                         CupertinoButton(
-                                            child: const Text('Cancelar'),
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            }
+                                          child: const Text('Cancelar'),
+                                          onPressed: () {
+                                            Navigator.pop(context);
+                                          }
                                         ),
                                       ],
                                     );
@@ -229,17 +224,16 @@ class _NewExpensePageState extends State<NewExpensePage> {
               const SizedBox(height: 30),
               CupertinoButton.filled(
                 onPressed: () {
-                  Expense expense = Expense(
-                    name: newExpenseController.nameExpenseInputController.text,
-                    value: int.parse(newExpenseController.valueExpenseInputController.text),
-                    tag: tagList[selectedTagIndex],
+                  newExpenseController.saveExpense(
+                    newExpenseController.nameExpenseInputController.text,
+                    int.parse(newExpenseController.valueExpenseInputController.text),
+                    tagList[selectedTagIndex],
                   );
-                  newExpenseController.saveExpense(expense);
                   showCupertinoDialog(
                     context: context,
                     builder: (BuildContext context) {
                       return CupertinoAlertDialog(
-                        title: const Text('Nova despensa lançada!'),
+                        title: const Text('Nova despesa lançada!'),
                         actions: <CupertinoDialogAction>[
                           CupertinoDialogAction(
                             isDefaultAction: true,
