@@ -64,12 +64,15 @@ class _HomePageStateState extends State<HomePageState> {
               children: [
                 SfCircularChart(
                   tooltipBehavior: _tooltip,
+                  title: ChartTitle(text: 'Meus gastos'),
+                  legend: const Legend(isVisible: true, overflowMode: LegendItemOverflowMode.scroll),
                   series: <CircularSeries<_ChartData, String>>[
                     DoughnutSeries<_ChartData, String>(
                       dataSource: data,
                       explode: true,
                       xValueMapper: (_ChartData data, _) => data.x, //key: string
                       yValueMapper: (_ChartData data, _) => data.y, //value: int
+                      dataLabelSettings: const DataLabelSettings(isVisible: true),
                       name: 'Gold'
                     ),
                   ],
