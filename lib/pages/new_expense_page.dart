@@ -3,19 +3,20 @@ import 'dart:core';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 //Controllers
 import 'package:myfinances/controllers/new_expense_controller.dart';
-import 'package:myfinances/entities/expense.dart';
 import 'package:myfinances/providers/firebase_provider.dart';
-import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 
 //Widgets
+import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
 
 //Entities
 import 'package:myfinances/entities/tag.dart';
+import 'package:myfinances/entities/expense.dart';
 
 
 class NewExpensePage extends StatefulWidget {
@@ -124,6 +125,9 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                                   }
                                                   return null;
                                                 },
+                                                inputFormatters: [
+                                                  LengthLimitingTextInputFormatter(20),
+                                                ],
                                               ),
                                             ),
                                           ),
@@ -231,6 +235,23 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     tag: tagList[selectedTagIndex],
                   );
                   newExpenseController.saveExpense(expense);
+                  showCupertinoDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return CupertinoAlertDialog(
+                        title: const Text('Nova despensa lançada!'),
+                        actions: <CupertinoDialogAction>[
+                          CupertinoDialogAction(
+                            isDefaultAction: true,
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text('Ok'),
+                          ),
+                        ],
+                      );
+                    }
+                  );
                 },
                 child: const Text('OK'),
               ),
