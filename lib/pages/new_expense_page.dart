@@ -1,10 +1,14 @@
+import 'dart:convert';
 import 'dart:core';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 
 //Controllers
 import 'package:myfinances/controllers/new_expense_controller.dart';
+import 'package:myfinances/providers/firebase_provider.dart';
+import 'package:myfinances/widgets/dropdown_tags_widget.dart';
 
 //Widgets
 import 'package:myfinances/widgets/modal_dialog_widget.dart';
@@ -23,7 +27,6 @@ class NewExpensePage extends StatefulWidget {
 
 class _NewExpensePageState extends State<NewExpensePage> {
   NewExpenseController newExpenseController = NewExpenseController();
-  late Future<List<Widget>>? listOfTags;
   late int selectedTag;
   late Color colorSelected;
   final TextEditingController nameTagInputController = TextEditingController();
@@ -33,7 +36,6 @@ class _NewExpensePageState extends State<NewExpensePage> {
   void initState() {
     selectedTag = 0;
     colorSelected = Colors.red;
-    listOfTags = newExpenseController.retrieveTagList();
     super.initState();
   }
 
@@ -146,7 +148,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                                 //TODO: Refatorar addNewTag para não precisar instanciar uma classe Tag
                                                 NewExpenseController().addNewTag(Tag(name: nameTagInputController.text, color: colorSelected.value));
                                                 setState(() {
-                                                  listOfTags = newExpenseController.retrieveTagList();
+                                                  // listOfTags = newExpenseController.retrieveTagList();
                                                 });
                                               }
                                               else{
@@ -167,13 +169,19 @@ class _NewExpensePageState extends State<NewExpensePage> {
                             }
                         ),
                         //DROPDOWN TAGS
-                        FutureBuilder<List<Widget>>(
-                          future: listOfTags,
-                          builder: (context, snapshot){
+                        StreamBuilder(
+                          stream: FirebaseProvider().dataBaseReference().child('/Tags').onValue,
+                          builder: (context, AsyncSnapshot<DatabaseEvent> snapshot){
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const CupertinoActivityIndicator();
                             } else {
-                              debugPrint("snapshot: ${snapshot.data}");
+                              final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
+                              List<Widget> dropdownlist = [];
+                              myTags.forEach((key, value) {
+                                final nextTag = Map<String, dynamic>.from(value);
+                                // debugPrint("${nextTag['name']}: ${nextTag['color']}");
+                                dropdownlist.add(DropdownTags(color: Color(nextTag['color']), tag: nextTag['name']));
+                              });
                               return CupertinoButton(
                                   padding: EdgeInsets.zero,
                                   onPressed: () => ModalDialogProvider().showDialog(
@@ -183,21 +191,21 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                       useMagnifier: true,
                                       itemExtent: 32.0,
                                       scrollController:
-                                      FixedExtentScrollController(initialItem: snapshot.data!.length,),
+                                      FixedExtentScrollController(initialItem: dropdownlist.length,),
                                       onSelectedItemChanged: (int selectedItem) {
                                         setState(() {
                                           selectedTag = selectedItem;
                                         });
                                       },
-                                      children: List<Widget>.generate(snapshot.data!.length, (int index) {
+                                      children: List<Widget>.generate(dropdownlist.length, (int index) {
                                         return Center(
-                                            child: snapshot.data![index]
+                                            child: dropdownlist[index],
                                         );
                                       }),
                                     ),
                                     context,
                                   ),
-                                  child: snapshot.data![selectedTag]
+                                  child: dropdownlist[selectedTag]
                               );
                             }
                           },
