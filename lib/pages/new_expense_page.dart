@@ -65,6 +65,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                       controller: newExpenseController.nameExpenseInputController,
                       prefix: const Text('Nome'),
                       placeholder: 'nome do gasto',
+                      autofocus: true,
                       maxLength: 18,
                       validator: (String? value) {
                         if (value == null || value.isEmpty) {
@@ -239,6 +240,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                             isDefaultAction: true,
                             onPressed: () {
                               Navigator.pop(context);
+                              newExpenseController.nameExpenseInputController.clear();
+                              newExpenseController.valueExpenseInputController.clear();
                             },
                             child: const Text('Ok'),
                           ),

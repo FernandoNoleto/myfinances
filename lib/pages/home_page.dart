@@ -28,25 +28,23 @@ class _HomePageStateState extends State<HomePageState> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: const CupertinoNavigationBar(
-        middle: Text('Minhas finanças'),
+      navigationBar: CupertinoNavigationBar(
+        middle: const Text('Minhas finanças'),
+        trailing: CupertinoButton(
+          child: const Icon(
+            CupertinoIcons.add
+          ),
+          onPressed: (){
+          Navigator.push(context, CupertinoPageRoute(builder: (context) => const NewExpensePage()));
+        }),
       ),
       child: SafeArea(
         child: getListExpenses() == [] ?
         const Text('tem despesas lançadas')
             :
-        Column(
+        const Column(
           children: [
-            const Text('Nao nada por aqui'),
-            Center(
-              child: CupertinoButton(
-                  child: const Text('Lançar nova despesa'),
-                  onPressed: () {
-                    Navigator.push(context, CupertinoPageRoute(builder: (context) => const NewExpensePage()),
-                    );
-                  }
-              ),
-            ),
+            Text('Nao nada por aqui'),
           ],
         ),
       ),
