@@ -1,5 +1,8 @@
 import 'package:flutter/cupertino.dart';
 import 'package:myfinances/pages/new_expense_page.dart';
+// import 'package:syncfusion_flutter_charts/charts.dart';
+// import 'package:syncfusion_flutter_charts/sparkcharts.dart';
+
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -28,26 +31,20 @@ class _HomePageStateState extends State<HomePageState> {
   @override
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
-      navigationBar: CupertinoNavigationBar(
-        middle: const Text('Minhas finanças'),
-        trailing: CupertinoButton(
-          child: const Icon(
-            CupertinoIcons.add
+      child: CustomScrollView(
+        slivers: <Widget>[
+          CupertinoSliverNavigationBar(
+            largeTitle: const Text('Minhas finanças'),
+            trailing: CupertinoButton(
+              child: const Icon(
+                CupertinoIcons.add
+              ),
+              onPressed: (){
+                Navigator.push(context, CupertinoPageRoute(builder: (context) => const NewExpensePage()));
+            }),
           ),
-          onPressed: (){
-          Navigator.push(context, CupertinoPageRoute(builder: (context) => const NewExpensePage()));
-        }),
-      ),
-      child: SafeArea(
-        child: getListExpenses() == [] ?
-        const Text('tem despesas lançadas')
-            :
-        const Column(
-          children: [
-            Text('Nao nada por aqui'),
-          ],
-        ),
-      ),
+        ],
+      )
     );
   }
 }
