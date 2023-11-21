@@ -1,4 +1,8 @@
+import 'dart:convert';
+
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:myfinances/controllers/home_page_controller.dart';
 import 'package:myfinances/entities/tag.dart';
 import 'package:myfinances/pages/new_expense_page.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
@@ -27,27 +31,13 @@ class HomePageState extends StatefulWidget {
 }
 
 class _HomePageStateState extends State<HomePageState> {
-  late List<_ChartData> data;
-  late TooltipBehavior _tooltip;
-  // late List<Expense> listExpenses;
+  late TooltipBehavior tooltip;
+  late List<Expense> listExpenses = [];
 
   @override
   void initState() {
-    // listExpenses = getListExpenses();
-    data = [
-      _ChartData('David', 25),
-      _ChartData('Steve', 38),
-      _ChartData('Jack', 34),
-      _ChartData('Others', 52)
-    ];
-    _tooltip = TooltipBehavior(enable: true);
+    tooltip = TooltipBehavior(enable: true);
     super.initState();
-  }
-
-  Future<List<Expense>> getListExpenses() async{
-    List<Expense> listExpenses = [];
-    listExpenses.add(Expense(name: 'name', value: 10, tag: Tag(color: 1000000, name: 'name')));
-    return listExpenses;
   }
 
   @override
@@ -69,39 +59,44 @@ class _HomePageStateState extends State<HomePageState> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                FutureBuilder(
-                  future: getListExpenses(),
-                  builder: (BuildContext context, snapshot) {
-                    return SfCircularChart(
-                      tooltipBehavior: _tooltip,
-                      title: ChartTitle(text: 'Meus gastos'),
-                      legend: const Legend(isVisible: true, overflowMode: LegendItemOverflowMode.scroll),
-                      series: <CircularSeries<_ChartData, String>>[
-                        DoughnutSeries<_ChartData, String>(
-                            dataSource: data,
+                StreamBuilder(
+                  stream: HomePageController().getExpensesList(),
+                  builder: (context, AsyncSnapshot<DatabaseEvent> snapshot){
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const CupertinoActivityIndicator();
+                    } else {
+                      final Map<String,dynamic> myExpenses = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
+                      myExpenses.forEach((key, value) {
+                        final nextExpense = Map<String, dynamic>.from(value);
+                        Expense expense = Expense(name: nextExpense['name'], value: nextExpense['value'], tag: Tag.fromJson(nextExpense['tag']));
+                        debugPrint('$expense');
+                        listExpenses.add(expense);
+                      });
+                      return SfCircularChart(
+                        tooltipBehavior: tooltip,
+                        title: ChartTitle(text: 'Meus gastos'),
+                        legend: const Legend(isVisible: true, overflowMode: LegendItemOverflowMode.scroll),
+                        series: <CircularSeries<Expense, String>>[
+                          DoughnutSeries<Expense, String>(
+                            dataSource: listExpenses,
                             explode: true,
-                            xValueMapper: (_ChartData data, _) => data.x, //key: string
-                            yValueMapper: (_ChartData data, _) => data.y, //value: int
+                            xValueMapper: (Expense expense, _) => expense.name, //key: string
+                            yValueMapper: (Expense expense, _) => expense.value, //value: int
                             dataLabelSettings: const DataLabelSettings(isVisible: true),
-                            name: 'Gold'
-                        ),
-                      ],
-                    );
-                  }
+                            strokeColor: CupertinoColors.activeGreen,
+                          ),
+                        ],
+                      );
+                    }
+                  },
                 ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
   }
 }
 
-class _ChartData {
-  _ChartData(this.x, this.y);
-
-  final String x;
-  final double y;
-}
 
