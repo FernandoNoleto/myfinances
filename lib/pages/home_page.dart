@@ -80,10 +80,10 @@ class _HomePageStateState extends State<HomePageState> {
                             DoughnutSeries<Tag, String>(
                               dataSource: listTags,
                               explode: true,
+                              pointColorMapper: (Tag tag, _) => Color(tag.color),
                               xValueMapper: (Tag tag, _) => tag.name, //key: Nome da tag
                               yValueMapper: (Tag tag, _) => tag.totalValue, //value: Valor total daquela tag
                               dataLabelSettings: const DataLabelSettings(isVisible: true),
-                              strokeColor: CupertinoColors.activeGreen,
                             ),
                           ],
                         );
