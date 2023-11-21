@@ -178,42 +178,47 @@ class _NewExpensePageState extends State<NewExpensePage> {
                             if (snapshot.connectionState == ConnectionState.waiting) {
                               return const CupertinoActivityIndicator();
                             } else {
-                              final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
-                              final List<Widget> dropdownlist = [];
+                              try{
+                                final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
+                                final List<Widget> dropdownlist = [];
 
-                              myTags.forEach((key, value) {
-                                final nextTag = Map<String, dynamic>.from(value);
-                                final tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue']);
-                                tagList.add(tag);
-                                // debugPrint("${nextTag['name']}: ${nextTag['color']}");
-                                dropdownlist.add(DropdownTags(tag: tag));
-                              });
-                              return CupertinoButton(
-                                  padding: EdgeInsets.zero,
-                                  onPressed: () => ModalDialogProvider().showDialog(
-                                    CupertinoPicker(
-                                      magnification: 1.22,
-                                      squeeze: 1.2,
-                                      useMagnifier: true,
-                                      itemExtent: 32.0,
-                                      scrollController:
-                                      FixedExtentScrollController(initialItem: dropdownlist.length,),
-                                      onSelectedItemChanged: (int selectedItem) {
-                                        setState(() {
-                                          selectedTagIndex = selectedItem;
-                                          selectedTag = tagList[selectedTagIndex];
-                                        });
-                                      },
-                                      children: List<Widget>.generate(dropdownlist.length, (int index) {
-                                        return Center(
+                                myTags.forEach((key, value) {
+                                  final nextTag = Map<String, dynamic>.from(value);
+                                  final tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue'].toDouble());
+                                  tagList.add(tag);
+                                  // debugPrint("${nextTag['name']}: ${nextTag['color']}");
+                                  dropdownlist.add(DropdownTags(tag: tag));
+                                });
+                                return CupertinoButton(
+                                    padding: EdgeInsets.zero,
+                                    onPressed: () => ModalDialogProvider().showDialog(
+                                      CupertinoPicker(
+                                        magnification: 1.22,
+                                        squeeze: 1.2,
+                                        useMagnifier: true,
+                                        itemExtent: 32.0,
+                                        scrollController:
+                                        FixedExtentScrollController(initialItem: dropdownlist.length,),
+                                        onSelectedItemChanged: (int selectedItem) {
+                                          setState(() {
+                                            selectedTagIndex = selectedItem;
+                                            selectedTag = tagList[selectedTagIndex];
+                                          });
+                                        },
+                                        children: List<Widget>.generate(dropdownlist.length, (int index) {
+                                          return Center(
                                             child: dropdownlist[index],
-                                        );
-                                      }),
+                                          );
+                                        }),
+                                      ),
+                                      context,
                                     ),
-                                    context,
-                                  ),
-                                  child: dropdownlist[selectedTagIndex]
-                              );
+                                    child: dropdownlist[selectedTagIndex]
+                                );
+                              } catch (error) {
+                                debugPrint("Erro: $error");
+                                return const SizedBox();
+                              }
                             }
                           },
                         ),
@@ -225,6 +230,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
               const SizedBox(height: 30),
               CupertinoButton.filled(
                 onPressed: () {
+                  //TODO:Consertar lançamento de nova despesa pois está sendo lançada em alguma Tag incorreta
                   NewExpenseController().sumValueToTag(int.parse(newExpenseController.valueExpenseInputController.text), tagList[selectedTagIndex].name);
                   newExpenseController.saveExpense(
                     newExpenseController.nameExpenseInputController.text,
