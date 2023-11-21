@@ -183,7 +183,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
 
                               myTags.forEach((key, value) {
                                 final nextTag = Map<String, dynamic>.from(value);
-                                final tag = Tag(name: nextTag['name'], color: nextTag['color']);
+                                final tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue']);
                                 tagList.add(tag);
                                 // debugPrint("${nextTag['name']}: ${nextTag['color']}");
                                 dropdownlist.add(DropdownTags(tag: tag));
@@ -225,6 +225,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
               const SizedBox(height: 30),
               CupertinoButton.filled(
                 onPressed: () {
+                  NewExpenseController().sumValueToTag(int.parse(newExpenseController.valueExpenseInputController.text), tagList[selectedTagIndex].name);
                   newExpenseController.saveExpense(
                     newExpenseController.nameExpenseInputController.text,
                     int.parse(newExpenseController.valueExpenseInputController.text),

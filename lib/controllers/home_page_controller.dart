@@ -7,7 +7,8 @@ import 'package:myfinances/providers/firebase_provider.dart';
 class HomePageController{
   DatabaseReference databaseReference = FirebaseProvider().dataBaseReference();
 
-  Stream<DatabaseEvent> getExpensesList(){
-    return FirebaseProvider().dataBaseReference().child('/Expenses').onValue;
+  Stream<DatabaseEvent> getTagsList(){
+    return FirebaseProvider().dataBaseReference().child('/Tags').onValue;
   }
+
 }

@@ -6,10 +6,6 @@ import 'package:myfinances/controllers/home_page_controller.dart';
 import 'package:myfinances/entities/tag.dart';
 import 'package:myfinances/pages/new_expense_page.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-// import 'package:syncfusion_flutter_charts/sparkcharts.dart';
-
-//Entities
-import 'package:myfinances/entities/expense.dart';
 
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
@@ -32,10 +28,11 @@ class HomePageState extends StatefulWidget {
 
 class _HomePageStateState extends State<HomePageState> {
   late TooltipBehavior tooltip;
-  late List<Expense> listExpenses = [];
+  late List<Tag> listTags = [];
 
   @override
   void initState() {
+    listTags.clear();
     tooltip = TooltipBehavior(enable: true);
     super.initState();
   }
@@ -60,28 +57,29 @@ class _HomePageStateState extends State<HomePageState> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 StreamBuilder(
-                  stream: HomePageController().getExpensesList(),
+                  stream: HomePageController().getTagsList(),
                   builder: (context, AsyncSnapshot<DatabaseEvent> snapshot){
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const CupertinoActivityIndicator();
                     } else {
-                      final Map<String,dynamic> myExpenses = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
-                      myExpenses.forEach((key, value) {
-                        final nextExpense = Map<String, dynamic>.from(value);
-                        Expense expense = Expense(name: nextExpense['name'], value: nextExpense['value'], tag: Tag.fromJson(nextExpense['tag']));
-                        debugPrint('$expense');
-                        listExpenses.add(expense);
+                      listTags.clear();
+                      final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
+                      myTags.forEach((key, value) {
+                        final nextTag = Map<String, dynamic>.from(value);
+                        // debugPrint("name: ${nextTag['name']}, color: ${nextTag['color']}, totalValue: ${nextTag['totalValue']}");
+                        Tag tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue']);
+                        listTags.add(tag);
                       });
                       return SfCircularChart(
                         tooltipBehavior: tooltip,
                         title: ChartTitle(text: 'Meus gastos'),
                         legend: const Legend(isVisible: true, overflowMode: LegendItemOverflowMode.scroll),
-                        series: <CircularSeries<Expense, String>>[
-                          DoughnutSeries<Expense, String>(
-                            dataSource: listExpenses,
+                        series: <CircularSeries<Tag, String>>[
+                          DoughnutSeries<Tag, String>(
+                            dataSource: listTags,
                             explode: true,
-                            xValueMapper: (Expense expense, _) => expense.name, //key: string
-                            yValueMapper: (Expense expense, _) => expense.value, //value: int
+                            xValueMapper: (Tag tag, _) => tag.name, //key: Nome da tag
+                            yValueMapper: (Tag tag, _) => tag.totalValue, //value: Valor total daquela tag
                             dataLabelSettings: const DataLabelSettings(isVisible: true),
                             strokeColor: CupertinoColors.activeGreen,
                           ),
@@ -98,5 +96,5 @@ class _HomePageStateState extends State<HomePageState> {
     );
   }
 }
-
+//TODO: Criar função de deletar gasto cadastrado no BD
 

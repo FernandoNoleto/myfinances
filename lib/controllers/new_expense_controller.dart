@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:myfinances/entities/expense.dart';
 
@@ -7,16 +8,12 @@ import 'package:myfinances/entities/tag.dart';
 //Providers
 import 'package:myfinances/providers/firebase_provider.dart';
 
-
-//Widgets
-// import 'package:myfinances/widgets/dropdown_tags_widget.dart';
-
 class NewExpenseController{
   final TextEditingController nameExpenseInputController = TextEditingController();
   final TextEditingController valueExpenseInputController = TextEditingController();
 
   void addNewTag(String name, int color) async{
-    Tag tag = Tag(name: name, color: color);
+    Tag tag = Tag(name: name, color: color, totalValue: 0);
     final tagReference = FirebaseProvider().connection('/Tags/${tag.name}');
     try{
       await tagReference.update(tag.toJson());
@@ -25,13 +22,14 @@ class NewExpenseController{
     }
 
   }
+
   void saveExpense(String name, int value, Tag tag) async {
     Expense expense = Expense(name: name, value: value, tag: tag);
-    debugPrint(''' Expense:
-    name: ${expense.name}
-    value: ${expense.value}
-    tag: ${expense.tag.name} ${expense.tag.color}
-    ''');
+    // debugPrint(''' Expense:
+    // name: ${expense.name}
+    // value: ${expense.value}
+    // tag: ${expense.tag.name} ${expense.tag.color}
+    // ''');
 
     final tagReference = FirebaseProvider().connection('/Expenses/${expense.name}');
     try{
@@ -39,6 +37,22 @@ class NewExpenseController{
     } catch (error){
       debugPrint("Erro: $error");
     }
+
+  }
+
+
+  void sumValueToTag(int value, String nameTag) async{
+    final tagReference = FirebaseProvider().connection('/Tags/$nameTag');
+    FirebaseProvider().connection('/Tags/$nameTag/totalValue').once().then((DatabaseEvent snapshot) async {
+      if(snapshot.snapshot.exists){
+        int tagTotalValue = snapshot.snapshot.value as int;
+        try{
+          await tagReference.update({'totalValue': tagTotalValue + value});
+        } catch (error){
+          debugPrint("Erro: $error");
+        }
+      }
+    });
 
   }
 }
