@@ -43,7 +43,7 @@ class _HomePageStateState extends State<HomePageState> {
       child: CustomScrollView(
         slivers: <Widget>[
           CupertinoSliverNavigationBar(
-            largeTitle: const Text('Minhas finanças'),
+            largeTitle: const Text('Minhas Finanças'),
             trailing: CupertinoButton(
               child: const Icon(
                 CupertinoIcons.add
@@ -68,13 +68,13 @@ class _HomePageStateState extends State<HomePageState> {
                         final Map<String,dynamic> myTags = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
                         myTags.forEach((key, value) {
                           final nextTag = Map<String, dynamic>.from(value);
-                          // debugPrint("name: ${nextTag['name']}, color: ${nextTag['color']}, totalValue: ${nextTag['totalValue']}");
+                          debugPrint("name: ${nextTag['name']}, color: ${nextTag['color']}, totalValue: ${nextTag['totalValue']}");
                           Tag tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue'].toDouble());
                           listTags.add(tag);
                         });
                         return SfCircularChart(
                           tooltipBehavior: tooltip,
-                          title: ChartTitle(text: 'Meus gastos'),
+                          // title: ChartTitle(text: 'Meus gastos'),
                           legend: const Legend(isVisible: true, overflowMode: LegendItemOverflowMode.scroll),
                           series: <CircularSeries<Tag, String>>[
                             DoughnutSeries<Tag, String>(

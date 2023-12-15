@@ -46,7 +46,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
   Widget build(BuildContext context) {
     return CupertinoPageScaffold(
       navigationBar: const CupertinoNavigationBar(
-        middle: Text('Nova despesa'),
+        middle: Text('Nova Despesa'),
       ),
       child: SafeArea(
         child: Form(
@@ -193,8 +193,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                     padding: EdgeInsets.zero,
                                     onPressed: () => ModalDialogProvider().showDialog(
                                       CupertinoPicker(
-                                        magnification: 1.22,
-                                        squeeze: 1.2,
+                                        magnification: 1.0,
+                                        squeeze: 1.0,
                                         useMagnifier: true,
                                         itemExtent: 32.0,
                                         scrollController:
@@ -206,7 +206,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                                           });
                                         },
                                         children: List<Widget>.generate(dropdownlist.length, (int index) {
-                                          return Center(
+                                          return Container(
+                                            margin: const EdgeInsets.fromLTRB(26,0,26,0),
                                             child: dropdownlist[index],
                                           );
                                         }),
@@ -241,7 +242,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     context: context,
                     builder: (BuildContext context) {
                       return CupertinoAlertDialog(
-                        title: const Text('Nova despesa lançada!'),
+                        title: const Text('Nova Despesa Lançada!'),
                         actions: <CupertinoDialogAction>[
                           CupertinoDialogAction(
                             isDefaultAction: true,

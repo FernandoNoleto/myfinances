@@ -19,8 +19,7 @@ class _DropdownTagsState extends State<DropdownTags> {
   @override
   Widget build(BuildContext context) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      // crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(widget.tag.name),
         const SizedBox(width: 10,),
