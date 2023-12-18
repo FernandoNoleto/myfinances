@@ -1,5 +1,7 @@
 import 'dart:convert';
 import 'dart:core';
+import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -27,12 +29,30 @@ class NewExpensePage extends StatefulWidget {
 }
 
 class _NewExpensePageState extends State<NewExpensePage> {
-  NewExpenseController newExpenseController = NewExpenseController();
+  final TextEditingController nameTagInputController = TextEditingController();
+  final NewExpenseController newExpenseController = NewExpenseController();
   late int selectedTagIndex;
   late Color selectedColor;
   late Tag selectedTag;
   late List<Tag> tagList = [];
-  final TextEditingController nameTagInputController = TextEditingController();
+  PlatformFile? pickedFile;
+
+  Future selectFile() async {
+    final result = await FilePicker.platform.pickFiles();
+    if (result == null) return;
+
+    setState(() {
+      pickedFile = result.files.first;
+    });
+  }
+
+  Future uploadFile(String pathFile) async{
+    final path = 'files/$pathFile/${pickedFile!.name}';
+    final file = File(pickedFile!.path!);
+
+    final ref = FirebaseProvider().storageReference(path);
+    ref.putFile(file);
+  }
 
 
   @override
@@ -86,6 +106,18 @@ class _NewExpensePageState extends State<NewExpensePage> {
                         }
                         return null;
                       },
+                    ),
+                  ),
+                  CupertinoFormRow(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        CupertinoButton(
+                          onPressed: selectFile,
+                          child: const Text('Adicionar Anexo...')
+                        ),
+                        pickedFile != null ? Flexible(child: Text(pickedFile!.name, overflow: TextOverflow.fade, maxLines: 1,softWrap: false,)) : const SizedBox(),
+                      ],
                     ),
                   ),
                 ],
@@ -237,6 +269,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     newExpenseController.nameExpenseInputController.text,
                     int.parse(newExpenseController.valueExpenseInputController.text),
                     tagList[selectedTagIndex],
+                    'file/${newExpenseController.nameExpenseInputController.text}'
                   );
                   showCupertinoDialog(
                     context: context,
@@ -247,6 +280,7 @@ class _NewExpensePageState extends State<NewExpensePage> {
                           CupertinoDialogAction(
                             isDefaultAction: true,
                             onPressed: () {
+                              uploadFile(newExpenseController.nameExpenseInputController.text);
                               Navigator.pop(context);
                               newExpenseController.nameExpenseInputController.clear();
                               newExpenseController.valueExpenseInputController.clear();

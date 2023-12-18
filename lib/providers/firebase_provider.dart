@@ -1,4 +1,5 @@
 import 'package:firebase_database/firebase_database.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 
 
 class FirebaseProvider{
@@ -12,6 +13,10 @@ class FirebaseProvider{
 
   dataBaseReference(){
     return FirebaseDatabase.instance.ref();
+  }
+
+  storageReference(String path){
+    return FirebaseStorage.instance.ref().child(path);
   }
 
 

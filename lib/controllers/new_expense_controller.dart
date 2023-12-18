@@ -23,8 +23,8 @@ class NewExpenseController{
 
   }
 
-  void saveExpense(String name, int value, Tag tag) async {
-    Expense expense = Expense(name: name, value: value, tag: tag);
+  void saveExpense(String name, int value, Tag tag, String pathFile) async {
+    Expense expense = Expense(name: name, value: value, tag: tag, pathFile: pathFile);
     // debugPrint(''' Expense:
     // name: ${expense.name}
     // value: ${expense.value}
@@ -39,7 +39,6 @@ class NewExpenseController{
     }
 
   }
-
 
   void sumValueToTag(int value, String nameTag) async{
     final tagReference = FirebaseProvider().connection('/Tags/$nameTag');
