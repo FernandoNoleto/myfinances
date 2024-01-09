@@ -23,8 +23,8 @@ class NewExpenseController{
 
   }
 
-  void saveExpense(String name, int value, Tag tag, String pathFile) async {
-    Expense expense = Expense(name: name, value: value, tag: tag, pathFile: pathFile);
+  void saveExpense(String name, int value, Tag tag, String pathFile, DateTime date) async {
+    Expense expense = Expense(name: name, value: value, tag: tag, pathFile: pathFile, date: date);
     // debugPrint(''' Expense:
     // name: ${expense.name}
     // value: ${expense.value}

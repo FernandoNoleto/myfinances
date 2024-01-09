@@ -6,12 +6,14 @@ class Expense{
   final int value;
   final Tag tag;
   final String pathFile;
+  final DateTime date;
 
   Expense({
     required this.name,
     required this.value,
     required this.tag,
     required this.pathFile,
+    required this.date,
   });
 
   factory Expense.fromJson(Map<String, dynamic> json) {
@@ -19,7 +21,8 @@ class Expense{
       name: json['name'] ?? "",
       value: json['value'] ?? 0,
       tag: Tag.fromJson(json['tag']),
-      pathFile: json['pathFile'] ?? '',
+      pathFile: json['pathFile'] ?? "",
+      date: json['date'] ?? "",
     );
   }
 
@@ -28,11 +31,12 @@ class Expense{
     'value': value,
     'tag': tag.toJson(),
     'pathFile': pathFile,
+    'date': date,
   };
 
   @override
   toString(){
-    return 'name: $name,' ' value: $value,' ' tag: $tag,' 'pathFile: $pathFile,';
+    return 'name: $name,' ' value: $value,' ' tag: $tag,' 'pathFile: $pathFile,' 'date: $date,';
   }
 
 }

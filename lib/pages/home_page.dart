@@ -58,6 +58,7 @@ class _HomePageStateState extends State<HomePageState> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
+                  //Builder dos graficos de gastos por Tag
                   StreamBuilder(
                     stream: HomePageController().getTagsList(),
                     builder: (context, AsyncSnapshot<DatabaseEvent> snapshot){
@@ -96,6 +97,7 @@ class _HomePageStateState extends State<HomePageState> {
                       }
                     },
                   ),
+                  //Builder do historico de expenses
                   StreamBuilder(
                     stream: HomePageController().getExpensesList(),
                     builder: (context, AsyncSnapshot<DatabaseEvent> snapshot) {
@@ -104,8 +106,8 @@ class _HomePageStateState extends State<HomePageState> {
                       }
                       else{
                         try{
-                          // debugPrint('${snapshot.data}');
                           listExpenses.clear();
+                          //Mapeando o Expense
                           final Map<String,dynamic> myExpenses = Map<String,dynamic>.from(jsonDecode(jsonEncode((snapshot.data!).snapshot.value)));
                           myExpenses.forEach((key, value) {
                             final nextExpense = Map<String, dynamic>.from(value);
@@ -114,7 +116,16 @@ class _HomePageStateState extends State<HomePageState> {
                             final nextTag = Map<String, dynamic>.from(nextExpense['tag']);
                             Tag tag = Tag(name: nextTag['name'], color: nextTag['color'], totalValue: nextTag['totalValue'].toDouble());
 
-                            Expense expense = Expense(name: nextExpense['name'], tag: tag, value: nextExpense['value'], pathFile: 'pathFile');
+                            Expense expense = Expense(
+                                name: nextExpense['name'],
+                                tag: tag,
+                                value: nextExpense['value'],
+                                pathFile: nextExpense['pathFile'],
+                                date: DateTime.parse(nextExpense['date']),
+                            );
+
+                            // Expense expense = Expense(name: "name", value: 10, tag: tag, pathFile: "pathFile", date: DateTime.now());
+
                             listExpenses.add(expense);
                           });
                           //Lista de historico de consumo
@@ -123,7 +134,16 @@ class _HomePageStateState extends State<HomePageState> {
                             children: List.generate(
                               listExpenses.length, (index) => CupertinoListTile(
                               title: Text(listExpenses[index].name),
-                              additionalInfo: Text("R\$: ${listExpenses[index].value.toStringAsFixed(2)}"),
+                              subtitle: Text("R\$: ${listExpenses[index].value.toStringAsFixed(2)}"),
+                              additionalInfo: Text(HomePageController().dateFormat(listExpenses[index].date)),
+                              trailing: const CupertinoListTileChevron(),
+                              onTap: () {
+                                // Navigator.of(context).push(
+                                //   CupertinoPageRoute(builder: (BuildContext context){
+                                //     return const NewExpensePage();
+                                //   })
+                                // );
+                              },
                               leading: Container(
                                 decoration: BoxDecoration(
                                     color: Color(listExpenses[index].tag.color),

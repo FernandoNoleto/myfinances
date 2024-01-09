@@ -269,7 +269,8 @@ class _NewExpensePageState extends State<NewExpensePage> {
                     newExpenseController.nameExpenseInputController.text,
                     int.parse(newExpenseController.valueExpenseInputController.text),
                     tagList[selectedTagIndex],
-                    'file/${newExpenseController.nameExpenseInputController.text}'
+                    'file/${newExpenseController.nameExpenseInputController.text}',
+                    DateTime.now(),
                   );
                   showCupertinoDialog(
                     context: context,
