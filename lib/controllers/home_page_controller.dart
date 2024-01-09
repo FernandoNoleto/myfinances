@@ -11,4 +11,8 @@ class HomePageController{
     return FirebaseProvider().dataBaseReference().child('/Tags').onValue;
   }
 
+  Stream<DatabaseEvent> getExpensesList(){
+    return FirebaseProvider().dataBaseReference().child('/Expenses').onValue;
+  }
+
 }
